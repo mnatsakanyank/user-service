@@ -51,7 +51,7 @@ public class EventsBuffer {
     @Scheduled(fixedRateString = "${scheduleFixedRate}")
     public void flushBuffer() {
         if (flushBuffer.get()) {
-            log.debug("Flushing buffer if there are ones in {}", queue.size());
+            log.debug("Flushing buffer if there are any {}", queue.size());
             while (queue.size() > 0) {
                 if (!flushBuffer.get()) {
                     break;
