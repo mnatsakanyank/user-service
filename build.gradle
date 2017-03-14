@@ -1,0 +1,96 @@
+group 'com.soundcloud'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext {
+        springBootVersion = '1.4.1.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath('se.transmode.gradle:gradle-docker:1.2')
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+apply plugin: "pmd"
+apply plugin: 'docker'
+
+jar {
+    baseName = 'user-service'
+    version = '0.1-SNAPSHOT'
+}
+
+bootRun {
+    // support passing -Dsystem.property=value to bootRun task
+    systemProperties = System.properties
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+def versions = [
+        spring          : "1.4.2.RELEASE",
+        lombok          : "1.16.10",
+        guava           : "20.0",
+        spock           : "1.1-groovy-2.4-rc-3",
+        jsr310          : "2.8.1",
+        jsr305          : "3.0.1",
+        javaSlang       : "2.0.5",
+        assertj         : "3.6.1",
+        junit           : "4.12",
+        mockito         : "1.10.19",
+        codecentric     : "1.4.6",
+        javax           : "1"
+]
+
+configurations {
+    compile.exclude module: "spring-boot-starter-tomcat"
+}
+
+dependencies {
+
+    /** Spring */
+    compile("org.springframework.boot:spring-boot-starter:${versions.spring}")
+    compile ("javax.inject:javax.inject:${versions.javax}")
+
+    /** Make Java Great Again */
+    compile("com.google.guava:guava:${versions.guava}")
+    compile("io.javaslang:javaslang:${versions.javaSlang}")
+    compileOnly("org.projectlombok:lombok:${versions.lombok}")
+    compile("com.google.code.findbugs:jsr305:${versions.jsr305}")
+
+    /** Development Helpers **/
+    compile("org.springframework.boot:spring-boot-devtools:${versions.spring}")
+
+    /** Test **/
+    testCompile("org.springframework.boot:spring-boot-starter-test:${versions.spring}")
+    testCompile("org.assertj:assertj-core:${versions.assertj}")
+    testCompile("io.javaslang:javaslang-test:${versions.javaSlang}")
+    testCompile("junit:junit:${versions.junit}")
+    testCompile("org.mockito:mockito-all:${versions.mockito}")
+}
+
+task buildDocker(type: Docker, dependsOn: build) {
+    baseImage = 'develar/java:latest'
+    applicationName = jar.baseName
+    push = project.hasProperty('push')
+    tag = "soundcloud/user-service"
+    addFile {
+        from jar
+        rename { 'app.jar' }
+    }
+    entryPoint(['java', '-jar', 'app.jar'])
+    exposePort(9090)
+    exposePort(9099)
+}
+
+buildDocker.dependsOn(build)

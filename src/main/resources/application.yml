@@ -1,0 +1,13 @@
+buffer:
+  capacity: 1000
+  scheduleFixedRate: 2000
+
+socket:
+  address: localhost
+  eventPort: 9090
+  clientPort: 9099
+
+spring:
+  boot:
+    admin:
+      url: http://localhost:8080
