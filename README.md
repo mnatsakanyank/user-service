@@ -47,7 +47,7 @@ To build and run Docker
 
 `docker run -p 9090:9090 -p 9099:9099 soundcloud/user-service:1.0-SNAPSHOT`
 
-NOTE: You should have Lombock plugin installed to build and run the app with IDE
+>NOTE: You should have Lombock plugin installed to build and run the app with IDE
 ****
 **Known issues**
 
